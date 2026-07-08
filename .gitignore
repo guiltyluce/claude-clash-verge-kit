@@ -1,0 +1,21 @@
+.DS_Store
+*.log
+*.tmp
+*.bak
+*.local
+.env
+.env.*
+!.env.example
+
+# Local runtime exports
+runtime/
+profiles/private/
+secrets/
+
+# Clash Verge generated or user-specific files
+*.mmdb
+*.dat
+cache.db
+clash-verge.yaml
+verge.yaml
+

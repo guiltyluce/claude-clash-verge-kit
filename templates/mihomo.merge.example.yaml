@@ -1,0 +1,182 @@
+# Clash Verge Rev / Mihomo merge template.
+# Copy this into your Clash Verge merge profile, then replace every
+# REPLACE_WITH_* placeholder with your own authorized values.
+#
+# Example IPs use RFC documentation ranges:
+# - 203.0.113.0/24
+# - 198.51.100.0/24
+# - 192.0.2.0/24
+
+mixed-port: 7897
+allow-lan: false
+mode: rule
+ipv6: false
+log-level: info
+
+tun:
+  enable: true
+  stack: gvisor
+  auto-route: true
+  strict-route: false
+  auto-detect-interface: true
+
+dns:
+  enable: true
+  listen: 127.0.0.1:1053
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - "*.lan"
+    - "*.local"
+    - "+.local"
+    - "+.feishu.cn"
+    - "+.larksuite.com"
+    - "+.feishucdn.com"
+    - "+.tencent.com"
+    - "+.qq.com"
+    - "+.wechat.com"
+    - "+.gtimg.com"
+    - "+.qcloud.com"
+    - "+.myqcloud.com"
+    - "+.tencent-cloud.net"
+  nameserver:
+    - https://dns.alidns.com/dns-query
+    - https://doh.pub/dns-query
+  fallback:
+    - https://1.1.1.1/dns-query
+    - https://8.8.8.8/dns-query
+
+proxies:
+  - name: vps-general-1
+    type: vless
+    server: 203.0.113.10
+    port: 443
+    uuid: REPLACE_WITH_VPS_UUID
+    tls: true
+    network: tcp
+    servername: REPLACE_WITH_VPS_SERVER_NAME
+    client-fingerprint: chrome
+    reality-opts:
+      public-key: REPLACE_WITH_VPS_REALITY_PUBLIC_KEY
+      short-id: REPLACE_WITH_VPS_REALITY_SHORT_ID
+
+  - name: home-residential-egress
+    type: socks5
+    server: 198.51.100.20
+    port: 1080
+    username: REPLACE_WITH_HOME_PROXY_USERNAME
+    password: REPLACE_WITH_HOME_PROXY_PASSWORD
+
+  - name: backup-ai-egress
+    type: vless
+    server: 192.0.2.30
+    port: 443
+    uuid: REPLACE_WITH_BACKUP_UUID
+    tls: true
+    network: tcp
+    servername: REPLACE_WITH_BACKUP_SERVER_NAME
+    client-fingerprint: chrome
+    reality-opts:
+      public-key: REPLACE_WITH_BACKUP_REALITY_PUBLIC_KEY
+      short-id: REPLACE_WITH_BACKUP_REALITY_SHORT_ID
+
+proxy-groups:
+  - name: PROXY
+    type: select
+    proxies:
+      - AUTO
+      - MANUAL
+      - vps-general-1
+      - backup-ai-egress
+
+  - name: AUTO
+    type: url-test
+    proxies:
+      - vps-general-1
+      - backup-ai-egress
+    url: https://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 80
+
+  - name: MANUAL
+    type: select
+    proxies:
+      - vps-general-1
+      - backup-ai-egress
+      - home-residential-egress
+
+  - name: CN-DIRECT
+    type: select
+    proxies:
+      - DIRECT
+      - PROXY
+
+  - name: AI
+    type: select
+    proxies:
+      - home-residential-egress
+      - backup-ai-egress
+      - vps-general-1
+      - PROXY
+
+  - name: CLAUDE
+    type: select
+    proxies:
+      - home-residential-egress
+      - backup-ai-egress
+
+  - name: GROK
+    type: select
+    proxies:
+      - home-residential-egress
+      - backup-ai-egress
+
+rules:
+  # Prevent proxy-over-proxy self loops. Add every node server IP here.
+  - IP-CIDR,203.0.113.10/32,DIRECT,no-resolve
+  - IP-CIDR,198.51.100.20/32,DIRECT,no-resolve
+  - IP-CIDR,192.0.2.30/32,DIRECT,no-resolve
+
+  # Domestic and daily-work traffic.
+  - DOMAIN-SUFFIX,feishu.cn,CN-DIRECT
+  - DOMAIN-SUFFIX,larksuite.com,CN-DIRECT
+  - DOMAIN-SUFFIX,feishucdn.com,CN-DIRECT
+  - DOMAIN-SUFFIX,tencent.com,CN-DIRECT
+  - DOMAIN-SUFFIX,qq.com,CN-DIRECT
+  - DOMAIN-SUFFIX,wechat.com,CN-DIRECT
+  - DOMAIN-SUFFIX,gtimg.com,CN-DIRECT
+  - DOMAIN-SUFFIX,qcloud.com,CN-DIRECT
+  - DOMAIN-SUFFIX,myqcloud.com,CN-DIRECT
+  - DOMAIN-SUFFIX,tencent-cloud.net,CN-DIRECT
+
+  # Claude official and diagnostic endpoints.
+  - DOMAIN-SUFFIX,anthropic.com,CLAUDE
+  - DOMAIN-SUFFIX,claude.ai,CLAUDE
+  - DOMAIN-SUFFIX,claude.com,CLAUDE
+  - DOMAIN-SUFFIX,ipinfo.io,CLAUDE
+  - DOMAIN-SUFFIX,ipify.org,CLAUDE
+  - DOMAIN,checkip.amazonaws.com,CLAUDE
+  - DOMAIN-SUFFIX,icanhazip.com,CLAUDE
+
+  # Grok / X.
+  - DOMAIN-SUFFIX,grok.com,GROK
+  - DOMAIN-SUFFIX,x.ai,GROK
+  - DOMAIN-SUFFIX,x.com,GROK
+  - DOMAIN-SUFFIX,twitter.com,GROK
+  - DOMAIN-SUFFIX,twimg.com,GROK
+  - DOMAIN-SUFFIX,t.co,GROK
+
+  # Other AI tools.
+  - DOMAIN-SUFFIX,openai.com,AI
+  - DOMAIN-SUFFIX,chatgpt.com,AI
+  - DOMAIN-SUFFIX,oaistatic.com,AI
+  - DOMAIN-SUFFIX,oaiusercontent.com,AI
+  - DOMAIN-SUFFIX,perplexity.ai,AI
+  - DOMAIN-SUFFIX,gemini.google.com,AI
+  - DOMAIN-SUFFIX,googleapis.com,AI
+
+  # Requires geosite/geoip data in your Mihomo runtime.
+  - GEOSITE,cn,CN-DIRECT
+  - GEOIP,CN,CN-DIRECT
+  - MATCH,PROXY
+

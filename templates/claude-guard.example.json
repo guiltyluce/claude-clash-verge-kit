@@ -1,0 +1,11 @@
+{
+  "command": "/usr/local/bin/claude",
+  "allowed_ips": [
+    "198.51.100.20"
+  ],
+  "allowed_cidrs": [
+    "198.51.100.0/24"
+  ],
+  "proxy": "http://127.0.0.1:7897"
+}
+
