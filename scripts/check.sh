@@ -14,10 +14,13 @@ required_files=(
   templates/claude-guard.example.json
   docs/architecture.md
   docs/clash-verge-setup.md
+  docs/windows-clash-verge-setup.md
   docs/vps-and-home-egress.md
   docs/claude-guard-integration.md
   docs/troubleshooting.md
   scripts/check-network.sh
+  scripts/check-network.ps1
+  scripts/set-windows-proxy-env.ps1
   scripts/check-secrets.sh
 )
 
@@ -42,4 +45,3 @@ else
 fi
 
 printf 'ok: all checks passed\n'
-

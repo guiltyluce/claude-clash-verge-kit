@@ -17,7 +17,7 @@ This is not an Anthropic, Claude, Clash Verge, or Mihomo official project.
 
 Use this kit if you already control or are authorized to use:
 
-- A macOS machine running Clash Verge Rev.
+- A macOS or Windows machine running Clash Verge Rev.
 - At least one VPS or proxy node for general traffic.
 - Optionally, one clean home-broadband or residential egress for Claude/Grok login paths.
 - A legal and compliant use case for the services you access.
@@ -59,10 +59,16 @@ The important design choice is separation:
 scripts/check.sh
 ```
 
-7. Run a live network check on your Mac:
+7. Run a live network check on your machine:
 
 ```bash
 RUN_NETWORK_CHECK=1 scripts/check.sh
+```
+
+On Windows PowerShell, use:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/check-network.ps1
 ```
 
 8. Install and configure `claude-guard` if you want Claude Code startup gating:
@@ -76,9 +82,12 @@ CLAUDE_GUARD_PROXY=http://127.0.0.1:7897 claude-guard --precheck-only
 - `templates/mihomo.merge.example.yaml`: sanitized Clash Verge / Mihomo merge template.
 - `templates/claude-guard.example.json`: sanitized Claude Guard config.
 - `scripts/check-network.sh`: live local proxy and endpoint checks.
+- `scripts/check-network.ps1`: Windows PowerShell live proxy and endpoint checks.
+- `scripts/set-windows-proxy-env.ps1`: Windows user environment proxy helper.
 - `scripts/check-secrets.sh`: blocks accidental publication of real node links and known private values.
 - `docs/architecture.md`: why the groups are split this way.
 - `docs/clash-verge-setup.md`: macOS Clash Verge setup notes.
+- `docs/windows-clash-verge-setup.md`: Windows Clash Verge setup and migration notes.
 - `docs/vps-and-home-egress.md`: how to model VPS and home-broadband egress safely.
 - `docs/claude-guard-integration.md`: how to connect this kit with Claude Guard.
 - `docs/troubleshooting.md`: common failure modes and checks.
@@ -112,4 +121,3 @@ claude-guard -> 127.0.0.1:7897 -> Clash Verge / Mihomo -> CLAUDE group
 ## License
 
 MIT.
-

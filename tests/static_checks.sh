@@ -24,6 +24,11 @@ require_in_file 'DOMAIN-SUFFIX,anthropic.com,CLAUDE' "$template"
 require_in_file 'DOMAIN-SUFFIX,feishu.cn,CN-DIRECT' "$template"
 require_in_file 'IP-CIDR,198.51.100.20/32,DIRECT,no-resolve' "$template"
 require_in_file 'REPLACE_WITH_' "$template"
+require_in_file 'PowerShell' "$root/docs/windows-clash-verge-setup.md"
+require_in_file '127.0.0.1:7897' "$root/docs/windows-clash-verge-setup.md"
+require_in_file 'param\(' "$root/scripts/check-network.ps1"
+require_in_file 'curl.exe' "$root/scripts/check-network.ps1"
+require_in_file 'SetEnvironmentVariable' "$root/scripts/set-windows-proxy-env.ps1"
 
 awk '
   /^  - name: CLAUDE$/ { in_group = "CLAUDE"; next }
