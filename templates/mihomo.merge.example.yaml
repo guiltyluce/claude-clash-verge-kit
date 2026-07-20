@@ -161,6 +161,7 @@ rules:
   # Grok / X.
   - DOMAIN-SUFFIX,grok.com,GROK
   - DOMAIN-SUFFIX,x.ai,GROK
+  - GEOSITE,x,GROK
   - DOMAIN-SUFFIX,x.com,GROK
   - DOMAIN-SUFFIX,twitter.com,GROK
   - DOMAIN-SUFFIX,twimg.com,GROK
@@ -179,4 +180,3 @@ rules:
   - GEOSITE,cn,CN-DIRECT
   - GEOIP,CN,CN-DIRECT
   - MATCH,PROXY
-

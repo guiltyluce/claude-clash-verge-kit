@@ -48,8 +48,14 @@ function Get-CurlTlsArgs {
 function Invoke-Curl {
   param([string[]]$Arguments)
   $curl = Require-CurlExe
-  $output = & $curl @Arguments 2>&1
-  $code = $LASTEXITCODE
+  $previousErrorActionPreference = $ErrorActionPreference
+  try {
+    $ErrorActionPreference = "Continue"
+    $output = & $curl @Arguments 2>&1
+    $code = $LASTEXITCODE
+  } finally {
+    $ErrorActionPreference = $previousErrorActionPreference
+  }
   return [pscustomobject]@{
     Code = $code
     Output = ($output -join "`n").Trim()
