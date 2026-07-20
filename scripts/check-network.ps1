@@ -37,6 +37,14 @@ function Require-CurlExe {
   return $curl.Source
 }
 
+function Get-CurlTlsArgs {
+  if ($env:OS -eq "Windows_NT") {
+    return @("--ssl-no-revoke")
+  }
+
+  return @()
+}
+
 function Invoke-Curl {
   param([string[]]$Arguments)
   $curl = Require-CurlExe
@@ -49,8 +57,10 @@ function Invoke-Curl {
 }
 
 function Check-ProxyIp {
+  $tlsArgs = Get-CurlTlsArgs
   $result = Invoke-Curl @(
     "-4", "-sS",
+    $tlsArgs,
     "--connect-timeout", "8",
     "--max-time", "15",
     "--proxy", $ProxyUrl,
@@ -66,8 +76,10 @@ function Check-ProxyIp {
 
 function Check-Anthropic {
   $nullDevice = Get-NullDevice
+  $tlsArgs = Get-CurlTlsArgs
   $result = Invoke-Curl @(
     "-4", "-sS",
+    $tlsArgs,
     "-o", $nullDevice,
     "--connect-timeout", "8",
     "--max-time", "15",
@@ -86,8 +98,10 @@ function Check-Anthropic {
 
 function Check-DirectIpv6Shape {
   $nullDevice = Get-NullDevice
+  $tlsArgs = Get-CurlTlsArgs
   $result = Invoke-Curl @(
     "-6", "-sS",
+    $tlsArgs,
     "-o", $nullDevice,
     "--noproxy", "*",
     "--connect-timeout", "5",
@@ -157,4 +171,3 @@ Check-DirectIpv6Shape
 Show-UserProxyEnvironment
 Show-WindowsProxyState
 Write-Ok "all Windows network checks completed"
-
